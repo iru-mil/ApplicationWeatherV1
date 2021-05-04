@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">ApplicationWeatherV1</string>
+    <string name="error">Error</string>
+    <string name="reload">Reload</string>
+    <string name="city_example">Нальчик</string>
+    <string name="temperature_example">+15</string>
+    <string name="feels_like_label">Ощущается как:  </string>
+    <string name="feels_like_example">+13</string>
+    <string name="title_main">Главный</string>
+    <string name="title_favorites">Избранное</string>
+    <string name="title_settings">Настройки</string>
+
+
+
 </resources>
