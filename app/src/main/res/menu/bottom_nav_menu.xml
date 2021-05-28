@@ -2,12 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/navigation_main"
+        android:id="@+id/navigation_home"
         android:icon="@drawable/ic_baseline_cloud_queue_24"
         android:title="@string/title_main" />
 
     <item
-        android:id="@+id/navigation_favorite"
+        android:id="@+id/navigation_favorites"
         android:icon="@drawable/ic_baseline_favorite_border_24"
         android:title="@string/title_favorites" />
 

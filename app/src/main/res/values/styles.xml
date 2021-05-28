@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="SettingsTheme">
+        <item name="shapeAppearanceSmallComponent">@style/Widget.Weather.SmallShapeAppearance</item>
+        <item name="android:typeface">monospace</item>
+        <item name="android:textAlignment">viewStart</item>
+    </style>
+
+    <style name="Widget.Weather.SmallShapeAppearance" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+        <item name="cornerFamilyTopLeft">rounded</item>
+        <item name="cornerSizeTopLeft">@dimen/corner_size_rounded</item>
+        <item name="cornerFamilyBottomRight">rounded</item>
+        <item name="cornerSizeBottomRight">@dimen/corner_size_rounded</item>
+    </style>
+
+</resources>
