@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.android.synthetic.main.favorites_fragment.*
 import ru.geekbrains.applicationweatherv1.R
 import ru.geekbrains.applicationweatherv1.dataFactory.Weather
 import ru.geekbrains.applicationweatherv1.databinding.FavoritesFragmentBinding
@@ -16,15 +17,16 @@ class FavoritesFragment : Fragment() {
     private var _binding: FavoritesFragmentBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var viewModel: FavoritesViewModel
+    private val viewModel: FavoritesViewModel by lazy {
+        ViewModelProvider(this).get(FavoritesViewModel::class.java)
+    }
     private val adapter = FavoritesFragmentAdapter(object : OnItemViewClickListener {
         override fun onItemViewClick(weather: Weather) {
-            val manager = activity?.supportFragmentManager
-            if (manager != null) {
-                val bundle = Bundle()
-                bundle.putParcelable(FavoritesDetailsFragment.BUNDLE_EXTRA, weather)
-                manager.beginTransaction()
-                    .add(R.id.container, FavoritesDetailsFragment.newInstance(bundle))
+            activity?.supportFragmentManager?.apply {
+                beginTransaction()
+                    .add(R.id.container, FavoritesDetailsFragment.newInstance(Bundle().apply {
+                        putParcelable(FavoritesDetailsFragment.BUNDLE_EXTRA, weather)
+                    }))
                     .addToBackStack("")
                     .commitAllowingStateLoss()
             }
@@ -43,7 +45,6 @@ class FavoritesFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.favoritesRecyclerView.adapter = adapter
         binding.favoritesFAB.setOnClickListener { changeWeatherDataSet() }
-        viewModel = ViewModelProvider(this).get(FavoritesViewModel::class.java)
         viewModel.getLiveData().observe(viewLifecycleOwner, {
             renderData(it)
         })
@@ -55,15 +56,22 @@ class FavoritesFragment : Fragment() {
         super.onDestroy()
     }
 
-    private fun changeWeatherDataSet() {
+    private fun changeWeatherDataSet() =
         if (isDataSetRus) {
             viewModel.getWeatherFromLocalSourceWorld()
-            binding.favoritesFAB.setImageResource(R.drawable.ic_earth)
+            favoritesFAB.setImageResource(R.drawable.ic_earth)
         } else {
             viewModel.getWeatherFromLocalSourceRus()
-            binding.favoritesFAB.setImageResource(R.drawable.ic_russia)
-        }
-        isDataSetRus = !isDataSetRus
+            favoritesFAB.setImageResource(R.drawable.ic_russia)
+        }.also { isDataSetRus = !isDataSetRus }
+
+    private fun View.showSnackBar(
+        text: String,
+        actionText: String,
+        action: (View) -> Unit,
+        length: Int = Snackbar.LENGTH_INDEFINITE
+    ) {
+        Snackbar.make(this, text, length).setAction(actionText, action).show()
     }
 
     private fun renderData(appState: AppState) {
@@ -76,16 +84,13 @@ class FavoritesFragment : Fragment() {
                 binding.favoritesLoadingLayout.visibility = View.VISIBLE
             }
             is AppState.Error -> {
-                binding.favoritesLoadingLayout.visibility = View.GONE
-                Snackbar
-                    .make(
-                        binding.favoritesFAB, getString(R.string.error),
-                        Snackbar.LENGTH_INDEFINITE
-                    )
-                    .setAction(getString(R.string.reload)) {
-                        viewModel.getWeatherFromLocalSourceRus()
-                    }
-                    .show()
+                favoritesLoadingLayout.visibility = View.GONE
+                favoritesContainer.showSnackBar(
+                    getString(R.string.error),
+                    getString(R.string.reload),
+                    { viewModel.getWeatherFromLocalSourceRus() }
+                )
+
             }
             else -> return
         }

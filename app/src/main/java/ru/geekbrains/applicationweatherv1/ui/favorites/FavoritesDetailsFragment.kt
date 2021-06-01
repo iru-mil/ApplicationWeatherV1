@@ -24,15 +24,15 @@ class FavoritesDetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val weather = arguments?.getParcelable<Weather>(BUNDLE_EXTRA)
-        if (weather != null) {
-            val city = weather.city
-            binding.cityName.text = city.city
-            binding.temperatureValue.text = weather.temp.toString()
-            binding.feelsLike.append(weather.feelsLike.toString())
-            binding.windSpeed.text = weather.windSpeed.toString()
-            binding.windDirection.text = weather.windDir
-            binding.humidityValue.text = weather.humidity.toString()
+        arguments?.getParcelable<Weather>(BUNDLE_EXTRA)?.let { weather ->
+            weather.city.also { city ->
+                binding.cityName.text = city.city
+                binding.temperatureValue.text = weather.temp.toString()
+                binding.feelsLike.append(weather.feelsLike.toString())
+                binding.windSpeed.text = weather.windSpeed.toString()
+                binding.windDirection.text = weather.windDir
+                binding.humidityValue.text = weather.humidity.toString()
+            }
         }
     }
 
