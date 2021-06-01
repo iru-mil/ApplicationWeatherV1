@@ -15,7 +15,7 @@ class HomeFragment : Fragment() {
 
     private var _binding: HomeFragmentBinding? = null
     private val binding get() = _binding!!
-    private lateinit var homeViewModel: HomeViewModel
+    private val homeViewModel: HomeViewModel by lazy { ViewModelProvider(this).get(HomeViewModel::class.java) }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -27,7 +27,6 @@ class HomeFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
         homeViewModel.getLiveData().observe(viewLifecycleOwner, { renderData(it) })
         homeViewModel.getWeatherFromLocalSource()
     }

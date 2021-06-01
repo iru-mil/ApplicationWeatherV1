@@ -42,10 +42,12 @@ class FavoritesFragmentAdapter(private var onItemViewClickListener: FavoritesFra
 
     inner class MainViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         fun bind(weather: Weather) {
-            itemView.findViewById<TextView>(R.id.recyclerItemTextView).text =
-                weather.city.city
-            itemView.setOnClickListener {
-                onItemViewClickListener?.onItemViewClick(weather)
+            itemView.apply {
+                findViewById<TextView>(R.id.recyclerItemTextView).text =
+                    weather.city.city
+                setOnClickListener {
+                    onItemViewClickListener?.onItemViewClick(weather)
+                }
             }
         }
     }
