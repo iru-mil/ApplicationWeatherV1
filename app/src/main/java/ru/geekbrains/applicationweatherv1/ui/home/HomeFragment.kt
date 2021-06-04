@@ -1,20 +1,35 @@
 package ru.geekbrains.applicationweatherv1.ui.home
 
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.google.android.material.snackbar.Snackbar
-import ru.geekbrains.applicationweatherv1.R
 import ru.geekbrains.applicationweatherv1.dataFactory.Weather
+import ru.geekbrains.applicationweatherv1.dataFactory.WeatherDTO
 import ru.geekbrains.applicationweatherv1.databinding.HomeFragmentBinding
+
+const val WEATHER_API_KEY = "c0eaea4c-4426-490c-a7f7-17416be29ac7"
 
 class HomeFragment : Fragment() {
 
+
     private var _binding: HomeFragmentBinding? = null
     private val binding get() = _binding!!
+    private lateinit var weatherBundle: Weather
+    private val onLoadListener: WeatherLoader.WeatherLoaderListener =
+        object : WeatherLoader.WeatherLoaderListener {
+
+            override fun onLoaded(weatherDTO: WeatherDTO) {
+                displayWeather(weatherDTO)
+            }
+
+            override fun onFailed(throwable: Throwable) {
+            }
+        }
     private val homeViewModel: HomeViewModel by lazy { ViewModelProvider(this).get(HomeViewModel::class.java) }
 
     override fun onCreateView(
@@ -25,45 +40,39 @@ class HomeFragment : Fragment() {
         return binding.root
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        homeViewModel.getLiveData().observe(viewLifecycleOwner, { renderData(it) })
-        homeViewModel.getWeatherFromLocalSource()
+    @RequiresApi(Build.VERSION_CODES.N)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        weatherBundle = arguments?.getParcelable(BUNDLE_EXTRA) ?: Weather()
+        binding.mainView.visibility = View.GONE
+        binding.loadingLayout.visibility = View.VISIBLE
+        val loader = WeatherLoader(
+            onLoadListener, weatherBundle.city.lat,
+            weatherBundle.city.lon
+        )
+        loader.loadWeather()
     }
 
-    private fun renderData(appState: AppState) {
-        when (appState) {
-            is AppState.SuccessHome -> {
-                val weatherData = appState.weatherData
-                binding.loadingLayout.visibility = View.GONE
-                setData(weatherData)
-            }
-            is AppState.Loading -> {
-                binding.loadingLayout.visibility = View.VISIBLE
-            }
-            is AppState.Error -> {
-                binding.loadingLayout.visibility = View.GONE
-                Snackbar
-                    .make(binding.mainView, getString(R.string.error), Snackbar.LENGTH_INDEFINITE)
-                    .setAction(getString(R.string.reload)) { homeViewModel.getWeatherFromLocalSource() }
-                    .show()
-            }
-            else -> return
+    private fun displayWeather(weatherDTO: WeatherDTO) {
+        with(binding) {
+            mainView.visibility = View.VISIBLE
+            loadingLayout.visibility = View.GONE
+            val city = weatherBundle.city
+            cityName.text = city.city
+            temperatureValue.text = weatherDTO.fact?.temp.toString()
+            feelsLike.text = weatherDTO.fact?.feels_like.toString()
+            windSpeed.text = weatherDTO.fact?.wind_speed.toString()
+            windDirection.text = weatherDTO.fact?.wind_dir
+            humidityValue.text = weatherDTO.fact?.humidity.toString()
         }
     }
 
-    private fun setData(weatherData: Weather) {
-        binding.cityName.text = weatherData.city.city
-        binding.temperatureValue.text = weatherData.temp.toString()
-        binding.feelsLike.append(weatherData.feelsLike.toString())
-        binding.windSpeed.text = weatherData.windSpeed.toString()
-        binding.windDirection.text = weatherData.windDir
-        binding.humidityValue.text = weatherData.humidity.toString()
+    companion object {
+        const val BUNDLE_EXTRA = "weather"
+        fun newInstance(bundle: Bundle): HomeFragment {
+            val fragment = HomeFragment()
+            fragment.arguments = bundle
+            return fragment
+        }
     }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-
 }

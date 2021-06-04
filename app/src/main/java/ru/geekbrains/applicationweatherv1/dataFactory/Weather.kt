@@ -17,7 +17,7 @@ data class Weather(
     val iconForecast: String = "https://yastatic.net/weather/i/icons/blueye/color/svg/<значение из поля icon>.svg."
 ) : Parcelable
 
-fun getDefaultCity() = City("Нальчик", 43.49806, 43.61889)
+fun getDefaultCity() = City("Нальчик", 43.485259, 43.607081)
 
 fun getFavoritesWorldCities() = listOf(
     Weather(City("Лондон", 51.5085300, -0.1257400), 1, 2),
