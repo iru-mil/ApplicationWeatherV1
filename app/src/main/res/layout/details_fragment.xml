@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/fragmentBackground">
+    android:layout_height="match_parent">
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -15,7 +14,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="fitXY"
-            app:srcCompat="@drawable/background"
+            app:srcCompat="@drawable/background_details"
             tools:ignore="ContentDescription" />
 
     </FrameLayout>
@@ -25,22 +24,27 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:background="@color/colorBackground"
         android:orientation="vertical"
         android:padding="@dimen/padding_margin_20dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center">
 
         <TextView
             android:id="@+id/cityName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
+            android:layout_marginBottom="@dimen/weather_icon_margin"
             android:text="@string/city_example"
             android:textSize="@dimen/city_text_size"
-            android:textStyle="bold" />
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/imageViewWeather"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/temperatureValue"
@@ -50,34 +54,39 @@
                 android:text="@string/temperature_example"
                 android:textSize="@dimen/text_size_25sp"
                 android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/feelsLike"
                 app:layout_constraintEnd_toStartOf="@+id/imageViewWeather"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@id/cityName" />
 
             <ImageView
                 android:id="@+id/imageViewWeather"
                 android:layout_width="80dp"
                 android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/feelsLike"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/temperatureValue"
-                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cityName"
                 tools:ignore="ContentDescription" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView
             android:id="@+id/feelsLike"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
+            android:layout_marginTop="@dimen/weather_icon_margin"
             android:text="@string/feels_like_label"
-            android:textSize="@dimen/feels_like_text_size" />
+            android:textSize="@dimen/feels_like_text_size"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/imageViewWeather" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_gravity="center">
 
             <ImageView
                 android:id="@+id/imageViewWind"
@@ -106,7 +115,6 @@
                 android:id="@+id/windDirection"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingStart="@dimen/padding_margin_20dp"
                 android:textSize="@dimen/feels_like_text_size"
                 android:textStyle="normal"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -117,12 +125,13 @@
 
             <ImageView
                 android:id="@+id/imageViewDirection"
-                android:layout_width="40dp"
-                android:layout_height="wrap_content"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/imageViewHumidity"
                 app:layout_constraintStart_toEndOf="@id/windDirection"
                 app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0"
                 tools:ignore="ContentDescription" />
 
             <ImageView

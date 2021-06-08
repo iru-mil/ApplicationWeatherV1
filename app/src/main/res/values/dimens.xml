@@ -10,7 +10,6 @@
     <dimen name="fab_icon_size">50dp</dimen>
     <dimen name="recycler_item_padding">10dp</dimen>
     <dimen name="recycler_item_line_height">1dp</dimen>
-
     <dimen name="weather_icon_margin">110dp</dimen>
 
 </resources>
