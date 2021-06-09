@@ -59,10 +59,10 @@ class FavoritesFragment : Fragment() {
     private fun changeWeatherDataSet() =
         if (isDataSetRus) {
             viewModel.getWeatherFromLocalSourceWorld()
-            favoritesFAB.setImageResource(R.drawable.ic_earth)
+            favoritesFAB.setImageResource(R.drawable.ic_earth_globe)
         } else {
             viewModel.getWeatherFromLocalSourceRus()
-            favoritesFAB.setImageResource(R.drawable.ic_russia)
+            favoritesFAB.setImageResource(R.drawable.ic_kremlin_russia)
         }.also { isDataSetRus = !isDataSetRus }
 
     private fun View.showSnackBar(

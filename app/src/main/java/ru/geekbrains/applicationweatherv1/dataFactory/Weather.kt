@@ -8,7 +8,7 @@ data class Weather(
     val city: City = getDefaultCity(),
     val temp: Int = 0,
     val feelsLike: Int = 0,
-    val icon: String = "https://yastatic.net/weather/i/icons/blueye/color/svg/<значение из поля icon>.svg.",
+    val icon: String? = "bkn_d",
     val windSpeed: Int = 0,
     val windDir: String = "S",
     val humidity: Int = 0,

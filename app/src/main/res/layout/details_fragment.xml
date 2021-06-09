@@ -63,7 +63,6 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/temperatureValue"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/ic_baseline_wb_sunny_24"
                 tools:ignore="ContentDescription" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -124,7 +123,6 @@
                 app:layout_constraintEnd_toStartOf="@id/imageViewHumidity"
                 app:layout_constraintStart_toEndOf="@id/windDirection"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/ic_baseline_west_24"
                 tools:ignore="ContentDescription" />
 
             <ImageView

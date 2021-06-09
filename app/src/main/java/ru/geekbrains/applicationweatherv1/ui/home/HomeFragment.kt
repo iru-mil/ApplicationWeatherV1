@@ -1,5 +1,6 @@
 package ru.geekbrains.applicationweatherv1.ui.home
 
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,15 +8,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import com.github.twocoffeesoneteam.glidetovectoryou.GlideToVectorYou
+import ru.geekbrains.applicationweatherv1.R
 import ru.geekbrains.applicationweatherv1.dataFactory.Weather
 import ru.geekbrains.applicationweatherv1.dataFactory.WeatherDTO
 import ru.geekbrains.applicationweatherv1.databinding.HomeFragmentBinding
 
-const val WEATHER_API_KEY = "c0eaea4c-4426-490c-a7f7-17416be29ac7"
-
 class HomeFragment : Fragment() {
-
 
     private var _binding: HomeFragmentBinding? = null
     private val binding get() = _binding!!
@@ -30,7 +29,6 @@ class HomeFragment : Fragment() {
             override fun onFailed(throwable: Throwable) {
             }
         }
-    private val homeViewModel: HomeViewModel by lazy { ViewModelProvider(this).get(HomeViewModel::class.java) }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -59,11 +57,66 @@ class HomeFragment : Fragment() {
             loadingLayout.visibility = View.GONE
             val city = weatherBundle.city
             cityName.text = city.city
-            temperatureValue.text = weatherDTO.fact?.temp.toString()
-            feelsLike.text = weatherDTO.fact?.feels_like.toString()
-            windSpeed.text = weatherDTO.fact?.wind_speed.toString()
-            windDirection.text = weatherDTO.fact?.wind_dir
-            humidityValue.text = weatherDTO.fact?.humidity.toString()
+
+            temperatureValue.text = if ((weatherDTO.fact?.temp)!! > 0) {
+                "+" + weatherDTO.fact.temp.toString() + resources.getString(R.string.degree)
+            } else {
+                weatherDTO.fact.temp.toString() + resources.getString(R.string.degree)
+            }
+            (weatherDTO.fact.wind_speed.toString() + resources.getString(R.string.wind_units)).also {
+                windSpeed.text = it
+            }
+            feelsLike.text = if ((weatherDTO.fact.feels_like)!! > 0) {
+                resources.getString(R.string.feels_like_label) + "+" + weatherDTO.fact.feels_like.toString() + resources.getString(
+                    R.string.degree
+                )
+            } else {
+                resources.getString(R.string.feels_like_label) + weatherDTO.fact.feels_like.toString() + resources.getString(
+                    R.string.degree
+                )
+            }
+            windDirection.text = when (weatherDTO.fact.wind_dir) {
+                "nw" -> {
+                    imageViewDirection.setImageResource(R.drawable.ic_up_left_icon); "СЗ"
+                }
+                "n" -> {
+                    imageViewDirection.setImageResource(R.drawable.ic_up_icon); "С"
+                }
+                "ne" -> {
+                    imageViewDirection.setImageResource(R.drawable.ic_up_right_icon); "СВ"
+                }
+                "e" -> {
+                    imageViewDirection.setImageResource(R.drawable.ic_right_icon); "В"
+                }
+                "se" -> {
+                    imageViewDirection.setImageResource(R.drawable.ic_down_right_icon); "ЮВ"
+                }
+                "s" -> {
+                    imageViewDirection.setImageResource(R.drawable.ic_down_icon); "Ю"
+                }
+                "sw" -> {
+                    imageViewDirection.setImageResource(R.drawable.ic_down_left_icon); "ЮЗ"
+                }
+                "w" -> {
+                    imageViewDirection.setImageResource(R.drawable.ic_left_icon); "З"
+                }
+                "c" -> {
+                    "штиль"
+                }
+                else -> {
+                    ""
+                }
+            }
+            (weatherDTO.fact.humidity.toString() + resources.getString(R.string.percent)).also {
+                humidityValue.text = it
+            }
+            weatherDTO.fact.icon?.let {
+                GlideToVectorYou.justLoadImage(
+                    activity,
+                    Uri.parse("https://yastatic.net/weather/i/icons/blueye/color/svg/${it}.svg"),
+                    imageViewWeather
+                )
+            }
         }
     }
 

@@ -2,9 +2,11 @@ package ru.geekbrains.applicationweatherv1.ui.home
 
 import android.os.Build
 import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.annotation.RequiresApi
 import com.google.gson.Gson
+import ru.geekbrains.applicationweatherv1.BuildConfig
 import ru.geekbrains.applicationweatherv1.dataFactory.WeatherDTO
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -13,15 +15,17 @@ import java.net.URL
 import java.util.stream.Collectors
 import javax.net.ssl.HttpsURLConnection
 
-class WeatherLoader (private val listener: WeatherLoaderListener, private val
-lat: Double, private val lon: Double) {
+class WeatherLoader(
+    private val listener: WeatherLoaderListener, private val
+    lat: Double, private val lon: Double
+) {
 
     @RequiresApi(Build.VERSION_CODES.N)
     fun loadWeather() {
         try {
             val uri =
                 URL("https://api.weather.yandex.ru/v2/informers?lat=${lat}&lon=${lon}")
-            val handler = Handler()
+            val handler = Handler(Looper.getMainLooper())
             Thread(Runnable {
                 lateinit var urlConnection: HttpsURLConnection
                 try {
@@ -29,7 +33,7 @@ lat: Double, private val lon: Double) {
                     urlConnection.requestMethod = "GET"
                     urlConnection.addRequestProperty(
                         "X-Yandex-API-Key",
-                       WEATHER_API_KEY
+                        BuildConfig.WEATHER_API_KEY
                     )
                     urlConnection.readTimeout = 10000
                     val bufferedReader =

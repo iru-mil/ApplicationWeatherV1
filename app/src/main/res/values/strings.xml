@@ -4,7 +4,7 @@
     <string name="reload">Reload</string>
     <string name="city_example">Нальчик</string>
     <string name="temperature_example">+15</string>
-    <string name="feels_like_label">Ощущается как: </string>
+    <string name="feels_like_label">"Ощущается как:  "</string>
     <string name="feels_like_example">+13</string>
     <string name="title_main">Главный</string>
     <string name="title_favorites">Избранное</string>
@@ -13,6 +13,8 @@
     <string name="add_greeting">Добавить приветствие</string>
     <string name="main_place">Место на главном экране</string>
     <string name="about">О приложении</string>
-
+    <string name="wind_units">" м/с,  "</string>
+    <string name="degree"> ° </string>
+    <string name="percent"> % </string>
 
 </resources>
