@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
+import coil.api.load
 import com.github.twocoffeesoneteam.glidetovectoryou.GlideToVectorYou
 import ru.geekbrains.applicationweatherv1.R
 import ru.geekbrains.applicationweatherv1.dataFactory.Weather
@@ -53,6 +54,8 @@ class HomeFragment : Fragment() {
 
     private fun displayWeather(weatherDTO: WeatherDTO) {
         with(binding) {
+            imageViewHeader.load("https://freepngimg.com/thumb/rainbow/27-rainbow-png-image.png")
+
             mainView.visibility = View.VISIBLE
             loadingLayout.visibility = View.GONE
             val city = weatherBundle.city

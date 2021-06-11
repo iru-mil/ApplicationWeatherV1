@@ -19,7 +19,7 @@ const val LATITUDE_EXTRA = "Latitude"
 const val LONGITUDE_EXTRA = "Longitude"
 private const val REQUEST_GET = "GET"
 private const val REQUEST_TIMEOUT = 10000
-private const val REQUEST_API_KEY = "X-Yandex-API-Key"
+const val REQUEST_API_KEY = "X-Yandex-API-Key"
 
 class FavoritesDetailsService(name: String = "FavoritesDetailService") : IntentService(name) {
     private val broadcastIntent = Intent(DETAILS_INTENT_FILTER)

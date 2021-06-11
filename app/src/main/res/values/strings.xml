@@ -1,4 +1,5 @@
 <resources>
+
     <string name="app_name">ApplicationWeatherV1</string>
     <string name="error">Error</string>
     <string name="reload">Reload</string>
@@ -16,5 +17,7 @@
     <string name="wind_units">" м/с,  "</string>
     <string name="degree"> ° </string>
     <string name="percent"> % </string>
+    <string name="system_message">Сообщение от системы</string>
+    <string name="action">"Действие: "</string>
 
 </resources>

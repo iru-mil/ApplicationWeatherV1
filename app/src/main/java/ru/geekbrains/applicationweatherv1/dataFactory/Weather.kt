@@ -8,7 +8,7 @@ data class Weather(
     val city: City = getDefaultCity(),
     val temp: Int = 0,
     val feelsLike: Int = 0,
-    val icon: String? = "bkn_d",
+    val icon: String? = "bkn_d",//
     val windSpeed: Int = 0,
     val windDir: String = "S",
     val humidity: Int = 0,

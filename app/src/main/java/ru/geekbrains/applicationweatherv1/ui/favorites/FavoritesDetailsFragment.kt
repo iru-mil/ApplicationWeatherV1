@@ -1,22 +1,21 @@
 package ru.geekbrains.applicationweatherv1.ui.favorites
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.annotation.SuppressLint
+import android.content.res.Resources
 import android.net.Uri
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import com.bumptech.glide.Glide
 import com.github.twocoffeesoneteam.glidetovectoryou.GlideToVectorYou
 import ru.geekbrains.applicationweatherv1.R
-import ru.geekbrains.applicationweatherv1.dataFactory.FactDTO
-import ru.geekbrains.applicationweatherv1.databinding.DetailsFragmentBinding
 import ru.geekbrains.applicationweatherv1.dataFactory.Weather
-import ru.geekbrains.applicationweatherv1.dataFactory.WeatherDTO
+import ru.geekbrains.applicationweatherv1.databinding.DetailsFragmentBinding
+import ru.geekbrains.applicationweatherv1.ui.home.AppState
+import ru.geekbrains.applicationweatherv1.ui.showSnackBar
 
 const val DETAILS_INTENT_FILTER = "DETAILS INTENT FILTER"
 const val DETAILS_LOAD_RESULT_EXTRA = "LOAD RESULT"
@@ -35,62 +34,16 @@ const val DETAILS_WIND_DIR_EXTRA = "WIND DIRECTION"
 const val DETAILS_HUMIDITY_EXTRA = "HUMIDITY"
 const val DETAILS_ICON_EXTRA = "ICON"
 
-private const val TEMP_INVALID = -100
-private const val FEELS_LIKE_INVALID = -100
-private const val WIND_SPEED_INVALID = -100
-private const val HUMIDITY_INVALID = -100
-private const val PROCESS_ERROR = "Обработка ошибки"
-
 class FavoritesDetailsFragment : Fragment() {
 
     private var _binding: DetailsFragmentBinding? = null
     private val binding get() = _binding!!
     private lateinit var weatherBundle: Weather
 
-    private val loadResultsReceiver: BroadcastReceiver = object :
-        BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            when (intent.getStringExtra(DETAILS_LOAD_RESULT_EXTRA)) {
-                DETAILS_INTENT_EMPTY_EXTRA -> TODO(PROCESS_ERROR)
-                DETAILS_DATA_EMPTY_EXTRA -> TODO(PROCESS_ERROR)
-                DETAILS_RESPONSE_EMPTY_EXTRA -> TODO(PROCESS_ERROR)
-                DETAILS_REQUEST_ERROR_EXTRA -> TODO(PROCESS_ERROR)
-                DETAILS_REQUEST_ERROR_MESSAGE_EXTRA -> TODO(PROCESS_ERROR)
-                DETAILS_URL_MALFORMED_EXTRA -> TODO(PROCESS_ERROR)
-                DETAILS_RESPONSE_SUCCESS_EXTRA -> renderData(
-                    WeatherDTO(
-                        FactDTO(
-                            intent.getIntExtra(DETAILS_TEMP_EXTRA, TEMP_INVALID),
-                            intent.getIntExtra(DETAILS_FEELS_LIKE_EXTRA, FEELS_LIKE_INVALID),
-                            intent.getIntExtra(DETAILS_WIND_SPEED_EXTRA, WIND_SPEED_INVALID),
-                            intent.getStringExtra(DETAILS_WIND_DIR_EXTRA),
-                            intent.getIntExtra(DETAILS_HUMIDITY_EXTRA, HUMIDITY_INVALID),
-                            intent.getStringExtra(DETAILS_ICON_EXTRA)
-                        )
-                    )
-                )
-                else -> TODO(PROCESS_ERROR)
-            }
-        }
+    private val detailsViewModel: FavoritesDetailsViewModel by lazy {
+        ViewModelProvider(this).get(FavoritesDetailsViewModel::class.java)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        context?.let {
-            LocalBroadcastManager.getInstance(it)
-                .registerReceiver(
-                    loadResultsReceiver,
-                    IntentFilter(DETAILS_INTENT_FILTER)
-                )
-        }
-    }
-
-    override fun onDestroy() {
-        context?.let {
-            LocalBroadcastManager.getInstance(it).unregisterReceiver(loadResultsReceiver)
-        }
-        super.onDestroy()
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -103,102 +56,79 @@ class FavoritesDetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         weatherBundle = arguments?.getParcelable(BUNDLE_EXTRA) ?: Weather()
-        getWeather()
+        detailsViewModel.detailsLiveData.observe(viewLifecycleOwner, {
+            renderData(it)
+        })
+        detailsViewModel.getWeatherFromRemoteSource(
+            weatherBundle.city.lat,
+            weatherBundle.city.lon
+        )
     }
 
-    private fun getWeather() {
-        binding.mainView.visibility = View.GONE
-        binding.loadingLayout.visibility = View.VISIBLE
-        context?.let {
-            it.startService(Intent(it, FavoritesDetailsService::class.java).apply {
-                putExtra(
-                    LATITUDE_EXTRA,
-                    weatherBundle.city.lat
-                )
-                putExtra(
-                    LONGITUDE_EXTRA,
-                    weatherBundle.city.lon
-                )
-            })
+    private fun renderData(appState: AppState) {
+        when (appState) {
+            is AppState.Success -> {
+                binding.mainView.visibility = View.VISIBLE
+                binding.loadingLayout.visibility = View.GONE
+                setWeather(appState.weatherData[0])
+            }
+            is AppState.Loading -> {
+                binding.mainView.visibility = View.GONE
+                binding.loadingLayout.visibility = View.VISIBLE
+            }
+            is AppState.Error -> {
+                binding.mainView.visibility = View.VISIBLE
+                binding.loadingLayout.visibility = View.GONE
+                binding.mainView.showSnackBar(
+                    getString(R.string.error),
+                    getString(R.string.reload),
+                    {
+                        detailsViewModel.getWeatherFromRemoteSource(
+                            weatherBundle.city.lat,
+                            weatherBundle.city.lon
+                        )
+                    })
+            }
+            else -> return
         }
     }
 
-    private fun renderData(weatherDTO: WeatherDTO) {
-        binding.mainView.visibility = View.VISIBLE
-        binding.loadingLayout.visibility = View.GONE
-        val fact = weatherDTO.fact
-        val temp = fact!!.temp
-        val feelsLike = fact.feels_like
-        val windSpeed = fact.wind_speed
-        val windDir = fact.wind_dir
-        val humidity = fact.humidity
-        val icon = fact.icon
-        if (temp == TEMP_INVALID || feelsLike == FEELS_LIKE_INVALID || windSpeed == WIND_SPEED_INVALID || windDir
-            == null || humidity == HUMIDITY_INVALID || icon == null
-        ) {
-            TODO(PROCESS_ERROR)
+    @SuppressLint("ResourceType", "UseCompatLoadingForDrawables")
+    private fun setWeather(weather: Weather) {
+        Glide.with(this).load("https://freepngimg.com/thumb/travel/30671-8-travel-clipart.png")
+            .into(binding.imageViewHeader)
+        val city = weatherBundle.city
+        binding.cityName.text = city.city
+        binding.temperatureValue.text = if (weather.temp > 0) {
+            "+" + weather.temp.toString() + resources.getString(R.string.degree)
         } else {
-            val city = weatherBundle.city
-            binding.cityName.text = city.city
-            binding.temperatureValue.text = if (temp!! > 0) {
-                "+" + temp.toString() + resources.getString(R.string.degree)
-            } else {
-                temp.toString() + resources.getString(R.string.degree)
-            }
-            (windSpeed.toString() + resources.getString(R.string.wind_units)).also {
-                binding.windSpeed.text = it
-            }
-            binding.feelsLike.text = if ((feelsLike)!! > 0) {
-                resources.getString(R.string.feels_like_label) + "+" + feelsLike.toString() + resources.getString(
-                    R.string.degree
-                )
-            } else {
-                resources.getString(R.string.feels_like_label) + feelsLike.toString() + resources.getString(
-                    R.string.degree
-                )
-            }
-            binding.windDirection.text = when (windDir) {
-                "nw" -> {
-                    binding.imageViewDirection.setImageResource(R.drawable.ic_up_left_icon); "СЗ"
-                }
-                "n" -> {
-                    binding.imageViewDirection.setImageResource(R.drawable.ic_up_icon); "С"
-                }
-                "ne" -> {
-                    binding.imageViewDirection.setImageResource(R.drawable.ic_up_right_icon); "СВ"
-                }
-                "e" -> {
-                    binding.imageViewDirection.setImageResource(R.drawable.ic_right_icon); "В"
-                }
-                "se" -> {
-                    binding.imageViewDirection.setImageResource(R.drawable.ic_down_right_icon); "ЮВ"
-                }
-                "s" -> {
-                    binding.imageViewDirection.setImageResource(R.drawable.ic_down_icon); "Ю"
-                }
-                "sw" -> {
-                    binding.imageViewDirection.setImageResource(R.drawable.ic_down_left_icon); "ЮЗ"
-                }
-                "w" -> {
-                    binding.imageViewDirection.setImageResource(R.drawable.ic_left_icon); "З"
-                }
-                "c" -> {
-                    "штиль"
-                }
-                else -> {
-                    ""
-                }
-            }
-            (humidity.toString() + resources.getString(R.string.percent)).also {
-                binding.humidityValue.text = it
-            }
-            icon.let {
-                GlideToVectorYou.justLoadImage(
-                    activity,
-                    Uri.parse("https://yastatic.net/weather/i/icons/blueye/color/svg/${it}.svg"),
-                    binding.imageViewWeather
-                )
-            }
+            weather.temp.toString() + resources.getString(R.string.degree)
+        }
+        (weather.windSpeed.toString() + resources.getString(R.string.wind_units)).also {
+            binding.windSpeed.text = it
+        }
+        binding.feelsLike.text = if ((weather.feelsLike) > 0) {
+            resources.getString(R.string.feels_like_label) + "+" + weather.feelsLike.toString() + resources.getString(
+                R.string.degree
+            )
+        } else {
+            resources.getString(R.string.feels_like_label) + weather.feelsLike.toString() + resources.getString(
+                R.string.degree
+            )
+        }
+        val res: Resources = resources
+        val sourceDir = res.getStringArray(R.array.source_dir)
+        val sourceApp = res.getStringArray(R.array.app_dir)
+        binding.windDirection.text = sourceApp[sourceDir.indexOf(weather.windDir)]
+        (weather.humidity.toString() + resources.getString(R.string.percent)).also {
+            binding.humidityValue.text = it
+        }
+        weather.icon.let {
+            GlideToVectorYou.justLoadImage(
+                activity,
+                Uri.parse("https://yastatic.net/weather/i/icons/blueye/color/svg/${it}.svg"),
+                binding.imageViewWeather
+            )
         }
     }
 

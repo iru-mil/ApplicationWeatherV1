@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="source_dir">
+        <item>nw</item>
+        <item>n</item>
+        <item>ne</item>
+        <item>e</item>
+        <item>se</item>
+        <item>s</item>
+        <item>sw</item>
+        <item>w</item>
+        <item>c</item>
+    </string-array>
+
+    <string-array name="app_dir">
+        <item>СЗ</item>
+        <item>С</item>
+        <item>СВ</item>
+        <item>В</item>
+        <item>ЮВ</item>
+        <item>Ю</item>
+        <item>ЮЗ</item>
+        <item>З</item>
+        <item>штиль</item>
+    </string-array>
+
+    <string-array name="icon_dir">
+        <item>ic_up_left_icon</item>
+        <item>ic_up_icon</item>
+        <item>ic_up_right_icon</item>
+        <item>ic_right_icon</item>
+        <item>ic_down_right_icon</item>
+        <item>ic_down_icon</item>
+        <item>ic_down_left_icon</item>
+        <item>ic_left_icon</item>
+        <item>ic_left_icon</item>
+    </string-array>
+
+</resources>
