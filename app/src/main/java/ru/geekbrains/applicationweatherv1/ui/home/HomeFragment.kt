@@ -1,5 +1,6 @@
 package ru.geekbrains.applicationweatherv1.ui.home
 
+import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -13,13 +14,16 @@ import com.github.twocoffeesoneteam.glidetovectoryou.GlideToVectorYou
 import ru.geekbrains.applicationweatherv1.R
 import ru.geekbrains.applicationweatherv1.dataFactory.Weather
 import ru.geekbrains.applicationweatherv1.dataFactory.WeatherDTO
+import ru.geekbrains.applicationweatherv1.dataFactory.WeatherLoader
 import ru.geekbrains.applicationweatherv1.databinding.HomeFragmentBinding
+import ru.geekbrains.applicationweatherv1.ui.settings.IS_ADD_GREETING
 
 class HomeFragment : Fragment() {
 
     private var _binding: HomeFragmentBinding? = null
     private val binding get() = _binding!!
     private lateinit var weatherBundle: Weather
+
     private val onLoadListener: WeatherLoader.WeatherLoaderListener =
         object : WeatherLoader.WeatherLoaderListener {
 
@@ -43,13 +47,25 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         weatherBundle = arguments?.getParcelable(BUNDLE_EXTRA) ?: Weather()
+        binding.greeting.visibility = View.GONE
         binding.mainView.visibility = View.GONE
-        binding.loadingLayout.visibility = View.VISIBLE
+        binding.includedLoadingLayout.loadingLayout.visibility = View.VISIBLE
         val loader = WeatherLoader(
             onLoadListener, weatherBundle.city.lat,
             weatherBundle.city.lon
         )
+        displayGreeting()
         loader.loadWeather()
+    }
+
+    private fun displayGreeting() {
+        activity?.let {
+            if (it.getPreferences(Context.MODE_PRIVATE).getBoolean(IS_ADD_GREETING, true)) {
+                binding.greeting.visibility = View.VISIBLE
+            } else {
+                binding.greeting.visibility = View.GONE
+            }
+        }
     }
 
     private fun displayWeather(weatherDTO: WeatherDTO) {
@@ -57,7 +73,7 @@ class HomeFragment : Fragment() {
             imageViewHeader.load("https://freepngimg.com/thumb/rainbow/27-rainbow-png-image.png")
 
             mainView.visibility = View.VISIBLE
-            loadingLayout.visibility = View.GONE
+            includedLoadingLayout.loadingLayout.visibility = View.GONE
             val city = weatherBundle.city
             cityName.text = city.city
 

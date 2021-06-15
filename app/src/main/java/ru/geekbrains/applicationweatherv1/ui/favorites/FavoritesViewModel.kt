@@ -2,9 +2,9 @@ package ru.geekbrains.applicationweatherv1.ui.favorites
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import ru.geekbrains.applicationweatherv1.dataFactory.RequestWeatherRepository
-import ru.geekbrains.applicationweatherv1.dataFactory.WeatherRepository
-import ru.geekbrains.applicationweatherv1.ui.home.AppState
+import ru.geekbrains.applicationweatherv1.dataFactory.app.AppState
+import ru.geekbrains.applicationweatherv1.dataFactory.repository.RequestWeatherRepository
+import ru.geekbrains.applicationweatherv1.dataFactory.repository.WeatherRepository
 
 class FavoritesViewModel(
 

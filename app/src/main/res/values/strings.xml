@@ -19,5 +19,7 @@
     <string name="percent"> % </string>
     <string name="system_message">Сообщение от системы</string>
     <string name="action">"Действие: "</string>
+    <string name="greeting">Привет, друг</string>
+    <string name="title_history">История</string>
 
 </resources>

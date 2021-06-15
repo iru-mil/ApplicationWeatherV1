@@ -1,4 +1,8 @@
-package ru.geekbrains.applicationweatherv1.dataFactory
+package ru.geekbrains.applicationweatherv1.dataFactory.repository
+
+import ru.geekbrains.applicationweatherv1.dataFactory.Weather
+import ru.geekbrains.applicationweatherv1.dataFactory.getFavoritesRussianCities
+import ru.geekbrains.applicationweatherv1.dataFactory.getFavoritesWorldCities
 
 class RequestWeatherRepository : WeatherRepository {
 

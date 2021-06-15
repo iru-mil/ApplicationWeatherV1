@@ -1,4 +1,4 @@
-package ru.geekbrains.applicationweatherv1.ui.home
+package ru.geekbrains.applicationweatherv1.dataFactory.app
 
 import ru.geekbrains.applicationweatherv1.dataFactory.Weather
 
