@@ -1,4 +1,4 @@
-package ru.geekbrains.applicationweatherv1.ui.home
+package ru.geekbrains.applicationweatherv1.dataFactory
 
 import android.os.Build
 import android.os.Handler
@@ -7,7 +7,6 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import com.google.gson.Gson
 import ru.geekbrains.applicationweatherv1.BuildConfig
-import ru.geekbrains.applicationweatherv1.dataFactory.WeatherDTO
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.MalformedURLException

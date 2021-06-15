@@ -18,6 +18,12 @@
         tools:layout="@layout/favorites_fragment" />
 
     <fragment
+        android:id="@+id/navigation_history"
+        android:name="ru.geekbrains.applicationweatherv1.ui.history.HistoryFragment"
+        android:label="@string/title_history"
+        tools:layout="@layout/history_fragment" />
+
+    <fragment
         android:id="@+id/navigation_settings"
         android:name="ru.geekbrains.applicationweatherv1.ui.settings.SettingsFragment"
         android:label="@string/title_settings"

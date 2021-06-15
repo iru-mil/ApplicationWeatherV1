@@ -1,4 +1,4 @@
-package ru.geekbrains.applicationweatherv1.ui
+package ru.geekbrains.applicationweatherv1.utils
 
 import android.view.View
 import com.google.android.material.snackbar.Snackbar

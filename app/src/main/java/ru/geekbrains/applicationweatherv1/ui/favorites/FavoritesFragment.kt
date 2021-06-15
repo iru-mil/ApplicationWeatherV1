@@ -1,5 +1,6 @@
 package ru.geekbrains.applicationweatherv1.ui.favorites
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,11 +12,15 @@ import kotlinx.android.synthetic.main.favorites_fragment.*
 import ru.geekbrains.applicationweatherv1.R
 import ru.geekbrains.applicationweatherv1.dataFactory.Weather
 import ru.geekbrains.applicationweatherv1.databinding.FavoritesFragmentBinding
-import ru.geekbrains.applicationweatherv1.ui.home.AppState
+import ru.geekbrains.applicationweatherv1.dataFactory.app.AppState
+import ru.geekbrains.applicationweatherv1.ui.favorites.details.FavoritesDetailsFragment
+
+private const val IS_WORLD_KEY = "LIST_OF_TOWNS_KEY"
 
 class FavoritesFragment : Fragment() {
     private var _binding: FavoritesFragmentBinding? = null
     private val binding get() = _binding!!
+    private var isDataSetWorld: Boolean = false
 
     private val viewModel: FavoritesViewModel by lazy {
         ViewModelProvider(this).get(FavoritesViewModel::class.java)
@@ -48,7 +53,21 @@ class FavoritesFragment : Fragment() {
         viewModel.getLiveData().observe(viewLifecycleOwner, {
             renderData(it)
         })
-        viewModel.getWeatherFromLocalSourceRus()
+        showListOfTowns()
+    }
+
+    private fun showListOfTowns() {
+        activity?.let {
+            if (it.getPreferences(Context.MODE_PRIVATE).getBoolean(
+                    IS_WORLD_KEY,
+                    false
+                )
+            ) {
+                changeWeatherDataSet()
+            } else {
+                viewModel.getWeatherFromLocalSourceRus()
+            }
+        }
     }
 
     override fun onDestroy() {
@@ -57,13 +76,25 @@ class FavoritesFragment : Fragment() {
     }
 
     private fun changeWeatherDataSet() =
-        if (isDataSetRus) {
-            viewModel.getWeatherFromLocalSourceWorld()
-            favoritesFAB.setImageResource(R.drawable.ic_earth_globe)
-        } else {
+        if (isDataSetWorld) {
             viewModel.getWeatherFromLocalSourceRus()
             favoritesFAB.setImageResource(R.drawable.ic_kremlin_russia)
-        }.also { isDataSetRus = !isDataSetRus }
+        } else {
+            viewModel.getWeatherFromLocalSourceWorld()
+            favoritesFAB.setImageResource(R.drawable.ic_earth_globe)
+        }.also {
+            isDataSetWorld = !isDataSetWorld
+            saveListOfTowns(isDataSetWorld)
+        }
+
+    private fun saveListOfTowns(isDataSetWorld: Boolean) {
+        activity?.let {
+            with(it.getPreferences(Context.MODE_PRIVATE).edit()) {
+                putBoolean(IS_WORLD_KEY, isDataSetWorld)
+                apply()
+            }
+        }
+    }
 
     private fun View.showSnackBar(
         text: String,
@@ -77,20 +108,19 @@ class FavoritesFragment : Fragment() {
     private fun renderData(appState: AppState) {
         when (appState) {
             is AppState.Success -> {
-                binding.favoritesLoadingLayout.visibility = View.GONE
+                binding.includedLoadingLayout.loadingLayout.visibility = View.GONE
                 adapter.setWeather(appState.weatherData)
             }
             is AppState.Loading -> {
-                binding.favoritesLoadingLayout.visibility = View.VISIBLE
+                binding.includedLoadingLayout.loadingLayout.visibility = View.VISIBLE
             }
             is AppState.Error -> {
-                favoritesLoadingLayout.visibility = View.GONE
+                binding.includedLoadingLayout.loadingLayout.visibility = View.GONE
                 favoritesContainer.showSnackBar(
                     getString(R.string.error),
                     getString(R.string.reload),
                     { viewModel.getWeatherFromLocalSourceRus() }
                 )
-
             }
             else -> return
         }
@@ -104,5 +134,4 @@ class FavoritesFragment : Fragment() {
     interface OnItemViewClickListener {
         fun onItemViewClick(weather: Weather)
     }
-
 }

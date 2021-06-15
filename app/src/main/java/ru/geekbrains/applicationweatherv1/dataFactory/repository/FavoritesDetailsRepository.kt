@@ -1,4 +1,6 @@
-package ru.geekbrains.applicationweatherv1.dataFactory
+package ru.geekbrains.applicationweatherv1.dataFactory.repository
+
+import ru.geekbrains.applicationweatherv1.dataFactory.WeatherDTO
 
 interface FavoritesDetailsRepository {
     fun getWeatherDetailsFromServer(

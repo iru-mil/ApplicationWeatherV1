@@ -1,4 +1,4 @@
-package ru.geekbrains.applicationweatherv1.ui.favorites
+package ru.geekbrains.applicationweatherv1.ui.favorites.details
 
 import android.annotation.SuppressLint
 import android.content.res.Resources
@@ -12,27 +12,11 @@ import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.github.twocoffeesoneteam.glidetovectoryou.GlideToVectorYou
 import ru.geekbrains.applicationweatherv1.R
+import ru.geekbrains.applicationweatherv1.dataFactory.City
 import ru.geekbrains.applicationweatherv1.dataFactory.Weather
 import ru.geekbrains.applicationweatherv1.databinding.DetailsFragmentBinding
-import ru.geekbrains.applicationweatherv1.ui.home.AppState
-import ru.geekbrains.applicationweatherv1.ui.showSnackBar
-
-const val DETAILS_INTENT_FILTER = "DETAILS INTENT FILTER"
-const val DETAILS_LOAD_RESULT_EXTRA = "LOAD RESULT"
-const val DETAILS_INTENT_EMPTY_EXTRA = "INTENT IS EMPTY"
-const val DETAILS_DATA_EMPTY_EXTRA = "DATA IS EMPTY"
-const val DETAILS_RESPONSE_EMPTY_EXTRA = "RESPONSE IS EMPTY"
-const val DETAILS_REQUEST_ERROR_EXTRA = "REQUEST ERROR"
-const val DETAILS_REQUEST_ERROR_MESSAGE_EXTRA = "REQUEST ERROR MESSAGE"
-const val DETAILS_URL_MALFORMED_EXTRA = "URL MALFORMED"
-const val DETAILS_RESPONSE_SUCCESS_EXTRA = "RESPONSE SUCCESS"
-
-const val DETAILS_TEMP_EXTRA = "TEMPERATURE"
-const val DETAILS_FEELS_LIKE_EXTRA = "FEELS LIKE"
-const val DETAILS_WIND_SPEED_EXTRA = "WIND SPEED"
-const val DETAILS_WIND_DIR_EXTRA = "WIND DIRECTION"
-const val DETAILS_HUMIDITY_EXTRA = "HUMIDITY"
-const val DETAILS_ICON_EXTRA = "ICON"
+import ru.geekbrains.applicationweatherv1.dataFactory.app.AppState
+import ru.geekbrains.applicationweatherv1.utils.showSnackBar
 
 class FavoritesDetailsFragment : Fragment() {
 
@@ -69,16 +53,16 @@ class FavoritesDetailsFragment : Fragment() {
         when (appState) {
             is AppState.Success -> {
                 binding.mainView.visibility = View.VISIBLE
-                binding.loadingLayout.visibility = View.GONE
+                binding.includedLoadingLayout.loadingLayout.visibility = View.GONE
                 setWeather(appState.weatherData[0])
             }
             is AppState.Loading -> {
                 binding.mainView.visibility = View.GONE
-                binding.loadingLayout.visibility = View.VISIBLE
+                binding.includedLoadingLayout.loadingLayout.visibility = View.VISIBLE
             }
             is AppState.Error -> {
                 binding.mainView.visibility = View.VISIBLE
-                binding.loadingLayout.visibility = View.GONE
+                binding.includedLoadingLayout.loadingLayout.visibility = View.GONE
                 binding.mainView.showSnackBar(
                     getString(R.string.error),
                     getString(R.string.reload),
@@ -98,6 +82,7 @@ class FavoritesDetailsFragment : Fragment() {
         Glide.with(this).load("https://freepngimg.com/thumb/travel/30671-8-travel-clipart.png")
             .into(binding.imageViewHeader)
         val city = weatherBundle.city
+        saveCity(city, weather)
         binding.cityName.text = city.city
         binding.temperatureValue.text = if (weather.temp > 0) {
             "+" + weather.temp.toString() + resources.getString(R.string.degree)
@@ -117,9 +102,15 @@ class FavoritesDetailsFragment : Fragment() {
             )
         }
         val res: Resources = resources
-        val sourceDir = res.getStringArray(R.array.source_dir)
-        val sourceApp = res.getStringArray(R.array.app_dir)
-        binding.windDirection.text = sourceApp[sourceDir.indexOf(weather.windDir)]
+        val sourceDirArray = res.getStringArray(R.array.source_dir)
+        val appDirArray = res.getStringArray(R.array.app_dir)
+        binding.windDirection.text = appDirArray[sourceDirArray.indexOf(weather.windDir)]
+        val iconDirArray = res.getStringArray(R.array.icon_dir)
+        val resourceID = this.getResources().getIdentifier(
+            iconDirArray[sourceDirArray.indexOf(weather.windDir)],
+            "drawable", getActivity()?.getPackageName()
+        )
+        binding.imageViewDirection.setImageResource(resourceID)
         (weather.humidity.toString() + resources.getString(R.string.percent)).also {
             binding.humidityValue.text = it
         }
@@ -131,6 +122,24 @@ class FavoritesDetailsFragment : Fragment() {
             )
         }
     }
+
+    private fun saveCity(
+        city: City,
+        weather: Weather
+    ) {
+        detailsViewModel.saveCityToDB(
+            Weather(
+                city,
+                weather.temp,
+                weather.feelsLike,
+                weather.icon,
+                weather.windSpeed,
+                weather.windDir,
+                weather.humidity
+            )
+        )
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

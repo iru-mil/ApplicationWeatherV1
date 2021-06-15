@@ -33,10 +33,9 @@
             android:id="@+id/imageViewHeader"
             android:layout_width="@dimen/home_image_width"
             android:layout_height="wrap_content"
-            android:scaleType="fitXY"
             android:layout_gravity="center"
+            android:scaleType="fitXY"
             tools:ignore="ContentDescription" />
-
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -171,19 +170,23 @@
 
     </LinearLayout>
 
-    <FrameLayout
-        android:id="@+id/loadingLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone"
-        tools:visibility="visible">
+    <include
+        android:id="@+id/includedLoadingLayout"
+        layout="@layout/loading_layout" />
 
-        <ProgressBar
-            android:id="@+id/progress"
-            style="?android:attr/progressBarStyle"
+    <FrameLayout
+        android:id="@+id/greeting"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center" />
+            android:text="@string/greeting"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="@dimen/text_size_25sp"
+            android:textStyle="bold" />
+
     </FrameLayout>
 
 </FrameLayout>
